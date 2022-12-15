@@ -1,0 +1,5 @@
+(library
+ (name lterm)
+ (public_name lambdapi.lterm)
+ (modules layered_term layered_term_old)
+ (libraries lambdapi.core lambdapi.parsing))

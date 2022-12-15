@@ -1,0 +1,5 @@
+(library
+ (name printer)
+ (public_name lambdapi.printer)
+ (modules pretty_printer)
+ (libraries lambdapi.core lambdapi.parsing))

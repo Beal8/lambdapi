@@ -20,9 +20,10 @@ let rec compile_with :
   handle:(Command.compiler -> Sig_state.t -> Syntax.p_command -> Sig_state.t)
   -> force:bool -> Command.compiler =
   fun ~handle ~force mp ->
-  if mp = Ghost.path then Ghost.sign else
   let base = file_of_path mp in
-  let src =
+  let src () =
+    (* Searching for source is delayed because we may not need it
+       in case of "ghost" signatures (such as for unification rules). *)
     let lp_src = base ^ lp_src_extension in
     let dk_src = base ^ dk_src_extension in
     match (Sys.file_exists lp_src, Sys.file_exists dk_src) with
@@ -37,7 +38,7 @@ let rec compile_with :
   let obj = base ^ obj_extension in
   if List.mem mp !loading then
     begin
-      fatal_msg "Circular dependencies detected in \"%s\".@." src;
+      fatal_msg "Circular dependencies detected in \"%s\".@." (src ());
       fatal_msg "Dependency stack for module %a:@." Path.pp mp;
       List.iter (fatal_msg "- %a@." Path.pp) !loading;
       fatal_no_pos "Build aborted."
@@ -45,10 +46,11 @@ let rec compile_with :
   match Path.Map.find_opt mp !loaded with
   | Some sign -> sign
   | None ->
-    if force || Extra.more_recent src obj then
+    if force || Extra.more_recent (src ()) obj then
     begin
       let forced = if force then " (forced)" else "" in
-      Console.out 1 "Checking \"%s\"%s ..." src forced;
+      let src = src () in
+      Console.out 1 "Loading \"%s\"%s ..." src forced;
       loading := mp :: !loading;
       let sign = Sig_state.create_sign mp in
       let sig_st = Stdlib.ref (Sig_state.of_sign sign) in
@@ -61,15 +63,13 @@ let rec compile_with :
       in
       Debug.stream_iter consume (Parser.parse_file src);
       Sign.strip_private sign;
-      if Stdlib.(!gen_obj) then begin
-        Console.out 1 "Writing \"%s\" ..." obj; Sign.write sign obj
-      end;
+      if Stdlib.(!gen_obj) then Sign.write sign obj;
       loading := List.tl !loading;
       sign
     end
     else
     begin
-      Console.out 1 "Loading \"%s\" ..." obj;
+      Console.out 1 "Loading \"%s\" ..." (src ());
       let sign = Sign.read obj in
       let compile mp _ = ignore (compile_with ~handle ~force:false mp) in
       Path.Map.iter compile !(sign.sign_deps);
