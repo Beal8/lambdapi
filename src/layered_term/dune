@@ -1,5 +1,5 @@
 (library
  (name lterm)
  (public_name lambdapi.lterm)
- (modules layered_term layered_term_old)
+ (modules layered_term layered_term_old tanslate)
  (libraries lambdapi.core lambdapi.parsing))

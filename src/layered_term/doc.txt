@@ -1,0 +1,49 @@
+['1', '50', '27', '40', '9', '17', '8', '35', '47', '53', '3', '20', '21', '26', '34', '15', '54', '57', '13', '30', '39', '46', '28', '38', '31', '29', '48', '43', '2', '41', '33', '19', '23', '5', '12', '36', '18', '52', '22', '49', '45', '10', '32', '25', '6', '44', '55', '37', '59', '51', '16', '4', '11', '60', '42', '58', '56', '24', '61', '14', '7']
+
+layer : le type des layer
+lterm : le type des terms layeré
+var : type d'une variable layeré
+rules : le type d'une règle
+
+normal_form : Calcule un layer dans sa forme normale
+                (Supprime les plus qd pas de variables dans l'addition)
+
+sup l1 l2 : l1 >= l2
+inf l1 l2 : l1 <= l2
+equal l1 l2 : l1 == l2
+sup_strict : l1 > l2
+inf_strict : l2 <l2
+
+in_list a l : teste si a est dans la liste l
+test_doublons l : revoit la liste de tous les éléments présents une ou plusieurs fois dans l
+                (Utiliser pour tester la non linéarité d'une règle)
+name_of v : renvoit le nom d'une variable
+
+non_linear t : teste la non linéarité du côté d'une règle (meta variables)
+
+suppr_doublons l -> renvoit la liste sans doublons
+
+non_left_linear_rule r : teste la non linéarité gauche
+non_right_linear_rule r : teste la non linéarité droite
+non_linear_rule r : teste la non linéarité d'une règle
+
+equality_of_vars : teste si deux vars sont égales (pas de layers pris en compte)
+(TODO : Changer le nom qui ne reflete pas la fonction)
+equality_of_terms : teste si deux termes sont équivalents à renommage près (pas de layer pris en compte)
+                    (Attention on cherche à faire matcher le premier terme au second donc on applique equality_of_terms lhs t pour tester si une règle s'applique et ainsi chopper la valuer des metavariable
+                    En gros on regarde les meta variable du premier terme avec les valeurs du second terme donc si le second terme a des meta variable on le verra pas)
+
+rule_application r t : teste si la règle r s'applique au term t et retourne la valeur des variables non linéaires
+rules_application lr t : teste si une règle de lr (liste de regle) s'applique à t et renvoit les valeurs des variables de la règle
+
+filter_assoc l1 l2 : on filtre la liste de paire l1 avec les valeurs de l2
+                    (filter_assoc [(1,2),(3,4),(5,6),(7,8)] [3,5] -> [4,6])
+
+non_linear_rule_application r t : regarde si la règle est non linéaire et si elle s'applique au terme t. Renvoit la valeur des meta variable non linéaires
+non_linear_rules_application lr t : même chose que non_linear_rule_application mais avec une liste de règles
+
+get_layer t : renvoit le layer du terme t
+get_subterms_layers t : renvoit la liste de tous les layers des sous termes de t (t inclus)
+
+check_layering t : vérifie les règles de layering sur l'arithmétique des layers
+check_non_linearity_layer t : vérifie les règes de layering partant sur la présence de règles non linéaires applicables
